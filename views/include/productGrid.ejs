@@ -1,0 +1,28 @@
+
+<div class="row">
+    <% if (products.length > 0){ %> 
+        <% products.forEach((product, index)=> { %>
+	<div class="col-md-4">
+		<figure class="card card-product-grid">
+			<div class="img-wrap"> 
+				<span class="badge badge-danger"> NEW </span>
+				<img src="/images/product/<%= product.product_picture %>">
+				<a class="btn-overlay" href="#"><i class="fa fa-search-plus"></i> Quick view</a>
+			</div> <!-- img-wrap.// -->
+			<figcaption class="info-wrap">
+				<div class="fix-height">
+					<a href="#" class="title"><%= product.product_name %></a>
+					<div class="price-wrap mt-2">
+						<span class="price"><%= product.product_price %> ฿</span>
+						<!-- <del class="price-old">$1980</del> -->
+					</div> <!-- price-wrap.// -->
+				</div>
+				<a href="#" class="btn btn-block btn-primary">Add to cart </a>
+			</figcaption>
+		</figure>
+	</div> <!-- col.// -->
+    <% }) %>
+<% }else { %> 
+    ไม่มีสินค้า
+    <%}  %>
+</div>  

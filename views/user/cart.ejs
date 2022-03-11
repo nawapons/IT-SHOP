@@ -1,0 +1,322 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="cache-control" content="max-age=604800" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>Kancomputer</title>
+
+	<link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+
+	<!-- jQuery -->
+	<script src="/js/jquery-2.0.0.min.js" type="text/javascript"></script>
+	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- Bootstrap4 files-->
+	<script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+	<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+
+	<!-- Font awesome 5 -->
+	<link href="/fonts/fontawesome/css/all.min.css" type="text/css" rel="stylesheet">
+
+	<!-- custom style -->
+	<link href="/css/ui.css" rel="stylesheet" type="text/css" />
+	<link href="/css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+	<!-- custom javascript -->
+	<script src="/js/script.js" type="text/javascript"></script>
+
+
+	<script type="text/javascript">
+		/// some script
+
+		// jquery ready start
+		$(document).ready(function () {
+			// jQuery code
+			const Toast = Swal.mixin({ //swal Sweelalert
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				timer: 1300,
+				timerProgressBar: true,
+				didOpen: (toast) => {
+					toast.addEventListener('mouseenter', Swal.stopTimer)
+					toast.addEventListener('mouseleave', Swal.resumeTimer)
+				}
+			})
+			var sum = 0;
+
+			$(".price").each(function () {
+				var val = $.trim($(this).html());
+
+				if (val) {
+					val = parseFloat(val.replace(/^\$/, ""));
+
+					sum += !isNaN(val) ? val : 0;
+					sum = sum+40;
+					$('.totalprice').html(sum + " " + "บาท ")
+				}
+			});
+
+			$('.removeCart').click(function (e) {
+				let pid = $(this).attr("rowid");
+				$.ajax({
+					type: "POST",
+					url: "/auth/removeCart",
+					data: { pid },
+					success: function (response) {
+						if (response == "success") {
+							location.reload();
+						} else {
+							Toast.fire({                //sweetalert error
+								icon: 'error',
+								title: response
+							}).then(function () {
+								location.reload();
+							})
+						}
+					}
+				});
+			})
+			$("#formAddress").on("submit", function (e) {
+                e.preventDefault();
+                let province = $('#province').val();
+                let district = $('#district').val();
+                let zipcode = $('#zipcode').val();
+                let detail = $('#detail').val();
+                $.ajax({
+                    url: "/auth/addAddress",
+                    method: "POST",
+                    data: {
+                        province: province,
+                        district: district,
+                        zipcode: zipcode,
+                        detail: detail,
+                    },
+                    success: function (data) {
+                        if (data == "success") {
+                            Toast.fire({                //sweetalert success
+                                icon: 'success',
+                                title: 'บันทึกที่อยู่สำเร็จ'
+                            }).then(function () {
+                                location.reload();
+                            })
+                        } else {
+                            Toast.fire({                //sweetalert success
+                                icon: 'error',
+                                title: data
+                            })
+                        }
+                    }
+                })
+            });
+		});
+// jquery end
+	</script>
+
+</head>
+<style>
+	.pDetail {
+		white-space: nowrap;
+		width: 300px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+</style>
+
+<body>
+
+
+	<%- include('../include/header') %>
+
+
+
+		<!-- ========================= SECTION PAGETOP ========================= -->
+		<section class="section-pagetop bg">
+			<div class="container">
+				<h2 class="title-page">ตะกร้าสินค้า</h2>
+				<nav>
+					<ol class="breadcrumb text-white">
+						<li class="breadcrumb-item"><a href="/home">หน้าหลัก</a></li>
+						<li class="breadcrumb-item active" aria-current="page">ตะกร้าสินค้า</li>
+						<!-- <li class="breadcrumb-item"><a href="#">Best category</a></li> -->
+						
+					</ol>
+				</nav>
+			</div> <!-- container //  -->
+		</section>
+		<!-- ========================= SECTION INTRO END// ========================= -->
+
+		<!-- ========================= SECTION CONTENT ========================= -->
+		<section class="section-content padding-y">
+			<div class="container">
+
+				<div class="row">
+					<main class="col-md-9">
+						<div class="card">
+
+							<table class="table table-borderless table-shopping-cart">
+								<thead class="text-muted">
+									<tr class="small text-uppercase">
+										<th scope="col">สินค้า</th>
+										<th scope="col" width="120">จำนวน</th>
+										<th scope="col" width="120">ราคา</th>
+										<th scope="col" class="text-right" width="200"> </th>
+									</tr>
+								</thead>
+								<tbody>
+									<% if(cartProduct.length> 0){ %>
+										<% cartProduct.forEach((cart,index)=>{%>
+											<tr>
+												<td>
+													<figure class="itemside">
+														<div class="aside"><img
+																src="images/product/<%= cart.product_picture %>"
+																class="img-sm"></div>
+														<figcaption class="info">
+															<a href="#" class="title text-dark">
+																<%= cart.product_name %>
+															</a>
+															<p class="text-muted small pDetail">
+																<%= cart.product_detail %>
+														</figcaption>
+													</figure>
+												</td>
+												<td>
+													<p>
+														<center>
+															<%= cart.product_Count %>
+														</center>
+													</p>
+												</td>
+												<td>
+													<div class="price-wrap">
+														<var class="price">
+															<%= cart.product_price*cart.product_Count %>
+														</var>
+														<small class="text-muted">
+															<%= cart.product_price %> บาท / ชิ้น
+														</small>
+													</div> <!-- price-wrap .// -->
+												</td>
+												<td class="text-right">
+													<button class="btn btn-light removeCart"
+														rowid="<%= cart.product_id %>"> Remove</button>
+												</td>
+											</tr>
+											<% }) %>
+												<% }else{ %>
+													<tr>
+														<td>ไม่มีสินค้า</td>
+													</tr>
+													<% } %>
+
+
+								</tbody>
+							</table>
+
+							<div class="card-body border-top">
+								
+								<a href="payment"  class="btn btn-info float-md-right <% if(address.length>0 && cartProduct.length>0){ %><% } else { %>disabled<% } %>"> สั่งซื้อสินค้า <i
+										class="fa fa-chevron-right"></i> </a>
+								<a href="/product" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue
+									shopping
+								</a>
+							</div>
+						</div> <!-- card.// -->
+
+						<div class="card mt-3">
+							
+							<div class="card-body">
+								<h5 class="card-title">ที่อยู่ในการจัดส่ง</h5>
+								<form action="" method="POST" id="formAddress"> 
+									<div class="row">
+										<div class="col-md-4">
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text" id="my-addon">จังหวัด</span>
+												</div>
+												<input class="form-control" type="text" id="province" name="province" placeholder="จังหวัด"
+													aria-label="จังหวัด" <% if(address.length>0){ %> value="<%= address[0].address_province %>" readonly <% } else { %> value="" <% } %> aria-describedby="my-addon">
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text" id="my-addon">อำเภอ</span>
+												</div>
+												<input class="form-control" type="text" id="district" name="district" placeholder="อำเภอ"
+													aria-label="อำเภอ" <% if(address.length>0){ %> value="<%= address[0].address_district %>" readonly <% } else { %> value="" <% } %> aria-describedby="my-addon">
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text" id="my-addon">รหัสไปรษณีย์</span>
+												</div>
+												<input class="form-control" type="text" id="zipcode" name="zipcode" <% if(address.length>0){ %> value="<%= address[0].address_zipcode %>" readonly <% } else { %> value="" <% } %>
+													placeholder="รหัสไปรษณีย์" aria-label="รหัสไปรษณีย์"
+													aria-describedby="my-addon">
+											</div>
+										</div>
+									</div>
+									<div class="input-group mt-3">
+										<div class="input-group-prepend">
+											<span class="input-group-text" id="my-addon">รายละเอียดที่อยู่</span>
+										</div>
+										<textarea class="form-control" type="text" name="detail"
+											aria-describedby="my-addon" <% if(address.length>0){ %> readonly<% } else { %><% } %>><% if(address.length>0){ %><%= address[0].address_detail %><% } else { %><% } %></textarea>
+									</div>
+									<button name="addAddress" type="submit" id="addAddress" class="btn btn-primary mt-3" <% if(address.length>0){ %>disabled<% } else { %><% } %> style="float: right;">บันทึกที่อยู่</button>
+									
+								</form>
+							</div>
+						</div>
+
+					</main> <!-- col.// -->
+					<aside class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+
+								<dl class="dlist">
+									<dt style="font-size: 12px;">ค่าจัดส่ง EMS:</dt>
+									<dd class="text-right" style="font-size: 12px;"><strong> 40 บาท</strong></dd>
+									<hr><dt>ราคารวม:</dt>
+									<dd class="text-right totalprice h5"><strong></strong></dd>
+									
+								</dl>
+								<hr>
+								<!-- <p class="text-center mb-3">
+									<img src="images/misc/payments.png" height="26">
+								</p> -->
+							</div> <!-- card-body.// -->
+						</div> <!-- card .// -->
+					</aside> <!-- col.// -->
+				</div>
+
+			</div> <!-- container .//  -->
+		</section>
+		<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+		<!-- ========================= FOOTER ========================= -->
+		<footer class="section-footer border-top padding-y">
+			<div class="container">
+				<p class="float-md-right">
+					&copy Copyright 2019 All rights reserved
+				</p>
+				<p>
+					<a href="#">Terms and conditions</a>
+				</p>
+			</div><!-- //container -->
+		</footer>
+		<!-- ========================= FOOTER END // ========================= -->
+
+
+
+</body>
+
+</html>

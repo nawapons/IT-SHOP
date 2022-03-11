@@ -1,0 +1,510 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="max-age=604800" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Kancomputer</title>
+
+    <!-- <link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"> -->
+
+    <!-- jQuery -->
+    <script src="/js/jquery-2.0.0.min.js" type="text/javascript"></script>
+    <script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Bootstrap4 files-->
+    <script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+
+    <!-- Font awesome 5 -->
+    <link href="/fonts/fontawesome/css/all.min.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css">
+    <!-- custom style -->
+    <link href="/css/ui.css" rel="stylesheet" type="text/css" />
+    <link href="/css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+    <!-- custom javascript -->
+    <script src="/js/script.js" type="text/javascript"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+        /// some script
+
+        // jquery ready start
+        $(document).ready(function () {
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1300,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            $("#formAddress").on("submit", function (e) {
+                e.preventDefault();
+                let province = $('#province').val();
+                let district = $('#district').val();
+                let zipcode = $('#zipcode').val();
+                let detail = $('#detail').val();
+                $.ajax({
+                    url: "/auth/addAddress",
+                    method: "POST",
+                    data: {
+                        province: province,
+                        district: district,
+                        zipcode: zipcode,
+                        detail: detail,
+                    },
+                    success: function (data) {
+                        if (data == "success") {
+                            Toast.fire({                //sweetalert success
+                                icon: 'success',
+                                title: 'บันทึกที่อยู่สำเร็จ'
+                            }).then(function () {
+                                location.reload();
+                            })
+                        } else {
+                            Toast.fire({                //sweetalert success
+                                icon: 'error',
+                                title: data
+                            })
+                        }
+                    }
+                })
+            });
+            $('#TableOrder').DataTable({
+                "pageLength": 15,
+            });
+            $("#formEditAddress").on("submit", function (e) {
+                e.preventDefault();
+                let province = $('#Eprovince').val();
+                let district = $('#Edistrict').val();
+                let zipcode = $('#Ezipcode').val();
+                let detail = $('#Edetail').val();
+                $.ajax({
+                    url: "/auth/editAddress",
+                    method: "POST",
+                    data: {
+                        province: province,
+                        district: district,
+                        zipcode: zipcode,
+                        detail: detail,
+                    },
+                    success: function (data) {
+                        if (data == "success") {
+                            Toast.fire({                //sweetalert success
+                                icon: 'success',
+                                title: 'แก้ไขที่อยู่สำเร็จ'
+                            }).then(function () {
+                                location.reload();
+                            })
+                        } else {
+                            Toast.fire({                //sweetalert success
+                                icon: 'error',
+                                title: data
+                            })
+                        }
+                    }
+                })
+            });
+            $('#TableHistory tbody').on('click', '.receiptbtn', function (e) {
+                e.preventDefault();
+                let id = $(this).attr("rowid");
+
+            })
+        });
+
+// jquery end
+    </script>
+
+</head>
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+
+<body>
+    <%- include('../include/header') %>
+
+
+        <!-- ========================= SECTION PAGETOP ========================= -->
+        <section class="section-pagetop bg">
+            <div class="container">
+                <h2 class="title-page">ข้อมูลส่วนตัว</h2>
+                <nav>
+                    <ol class="breadcrumb text-white">
+                        <li class="breadcrumb-item"><a href="/home">หน้าหลัก</a></li>
+                        <!-- <li class="breadcrumb-item"><a href="#">Best category</a></li> -->
+                        <li class="breadcrumb-item active" aria-current="page">ข้อมูลส่วนตัว</li>
+                    </ol>
+                </nav>
+            </div> <!-- container //  -->
+        </section>
+        <!-- ========================= SECTION INTRO END// ========================= -->
+        <!-- ========================= SECTION INTRO END// ========================= -->
+
+        <!-- ========================= SECTION CONTENT ========================= -->
+        <section class="section-content padding-y">
+            <div class="container">
+
+                <div class="row">
+                    <aside class="col-md-3">
+                        <div class="list-group shadow-sm" id="list-tab" role="tablist">
+                            <a class="list-group-item list-group-item-action active" id="list-profile-list"
+                                data-toggle="list" role="tab" href="#list-profile"> ข้อมูลส่วนตัว
+                            </a>
+                            <a class="list-group-item list-group-item-action" id="list-history-list" data-toggle="list"
+                                role="tab" href="#list-history">รายการสั่งซื้อ</a>
+
+                            <a class="list-group-item list-group-item-action" id="list-edit-list" data-toggle="list"
+                                role="tab" href="#list-edit">แก้ไขข้อมูลส่วนตัว </a>
+                        </div>
+                    </aside> <!-- col.// -->
+
+                    <main class="col-md-9">
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="list-profile" role="tabpanel"
+                                aria-labelledby="list-profile-list">
+                                <article class="card mb-3">
+                                    <div class="card-body">
+
+                                        <figure class="icontext">
+                                            <!-- <div class="icon">
+                                            <img class="rounded-circle img-sm border" src="images/product/noimage.jpg">
+                                        </div> -->
+                                            <div class="text">
+                                                <strong>ชื่อ-สกุล :</strong>
+                                                <%= locals.fname + " " + locals.lname %> <br>
+                                                    <strong>อีเมล : </strong>
+                                                    <%= profiles[0].user_email %><br>
+                                                        <a href="#">แก้ไข</a>
+                                            </div>
+                                        </figure>
+                                        <hr>
+                                        <p>
+                                            <i class="fa fa-map-marker text-muted"></i> &nbsp; ที่อยู่ของฉัน:
+                                            <br>
+                                            <% if(address.length>0) { %>
+                                                <%= address[0].address_detail %>
+                                                    <%= address[0].address_district %>
+                                                        <%= address[0].address_province %>
+                                                            <%= address[0].address_zipcode %>
+                                                                <% }else{ %>
+                                                                    ไม่มีข้อมูล
+                                                                    <% } %>
+                                                                        <a href="#" class="btn-link"> แก้ไข</a>
+                                        </p>
+
+                                        <article class="card-group">
+                                            <figure class="card bg">
+                                                <div class="p-3">
+                                                    <h5 class="card-title">
+                                                        <% if(history.length>0){ %> <%= history.length %>
+                                                                <% }else{%>0<%} %>
+                                                    </h5>
+                                                    <span>รายการสั่งซื้อ</span>
+                                                </div>
+                                            </figure>
+
+                                            <figure class="card bg">
+                                                <div class="p-3">
+                                                    <h5 class="card-title">
+                                                        <% if(history.length>0){ %> <%= history.length %>
+                                                                <% }else{%>0<%} %>
+                                                    </h5>
+                                                    <span>รอการจัดส่ง</span>
+                                                </div>
+                                            </figure>
+                                            <figure class="card bg">
+                                                <div class="p-3">
+                                                    <h5 class="card-title">0</h5>
+                                                    <span>จัดส่งเสร็จสิ้น</span>
+                                                </div>
+                                            </figure>
+                                        </article>
+                                </article> <!-- card.// -->
+
+                                <article class="card  mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-4">รายการสั่งซื้อล่าสุด </h5>
+                                    </div>
+                                </article>
+                                <a href="#" class="btn btn-outline-primary"> See all orders </a>
+                            </div>
+
+                            <div class="tab-pane fade show " id="list-history" role="tabpanel"
+                                aria-labelledby="list-edit-list">
+                                <article class="card mb-3">
+                                    <div class="card-body">
+                                        <strong>รายการสั่งซื้อทั้งหมด</strong>
+                                        <hr>
+                                        <table class="table table-hover mt-2 shadow-sm" id="TableHistory">
+                                            <thead style="background-color: #219ebc;color: #f1faee;" align="center">
+                                                <tr>
+                                                    <th scope="col">รายการที่</th>
+                                                    <th scope="col">รหัสการจ่ายเงิน</th>
+                                                    <th scope="col">วันที่สั่งซื้อ</th>
+                                                    <th scope="col">จำนวนสินค้า</th>
+                                                    <th scope="col">ราคารวม</th>
+                                                    <th scope="col">สถานะ</th>
+                                                    <th scope="col">จัดการ</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody align="center">
+                                                <form action="" method="post" class="receiptShow">
+                                                    <% if(hissum.length>0){ %>
+                                                        <% var i=1; hissum.forEach((history, index)=> { %>
+
+                                                            <tr>
+                                                                <td>
+                                                                    <%= i %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= history.history_code %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= history.history_date.toLocaleString('th-TH').replace(/T/, ' '
+                                                                        ).replace(/\..+/, '' ) %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= history.TOTAL_AMOUNT %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= history.TOTAL_PRICE %>
+                                                                </td>
+                                                                <td>
+                                                                    <% if(history.history_status=="W" ){%>
+                                                                        <font class="text-warning">รอยืนยัน</font>
+                                                                        <%}else if(history.history_status=="Y" ){%>
+                                                                            <font class="text-success">ชำระเงินสำเร็จ
+                                                                            </font>
+                                                                            <%}else{%>
+                                                                                <font class="text-danger">ถูกยกเลิก
+                                                                                </font>
+                                                                                <%} %>
+                                                                </td>
+                                                                <td>
+                                                                    <button type="submit"
+                                                                        class="btn btn-warning btn-sm receiptbtn"
+                                                                        rowid="<%= history.history_code %>"><i
+                                                                            class="fas fa-receipt"></i></button>
+                                                                    <button type="button"
+                                                                        class="btn btn-primary btn-sm viewems"
+                                                                        rowid="<%= history.history_code %>"
+                                                                        data-toggle="modal"
+                                                                        data-target="#emsID<%= history.history_code %>" <% if(history.history_status != "Y"){%> disabled <%} %>>
+                                                                        <i class="fas fa-eye"></i></button>
+                                                                          <!-- Modal -->
+                                                    <div class="modal fade" id="emsID<%= history.history_code %>"
+                                                        tabindex="-1" role="dialog"
+                                                        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered "
+                                                            role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLongTitle">
+                                                                        <i class="fas fa-plus"></i>
+                                                                        หมายเลข EMS [<%= history.history_code
+                                                                            %>]
+                                                                    </h5>
+                                                                    <button type="button" class="close"
+                                                                        data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form action="" method="post">
+                                                                        <label>เลข Track (EMS)</label>
+                                                                        <input type="text"
+                                                                            class="form-control emsnumber"
+                                                                            placeholder="เลข Track (EMS)"
+                                                                            name="emsnumber" value="<%= history.history_ems %>" readonly>
+
+                                                                </div>
+                                                                <!---modal body end-->
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">ปิด</button>
+                                                                </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!---modal end-->
+                                                                </td>
+                                                            </tr>
+
+                                                            <% i++; }) %>
+                                                                <% }else{ %>
+                                                                    <tr>
+                                                                        <td colspan="7">ไม่มีข้อมูล</td>
+                                                                    </tr>
+                                                                    <% } %>
+
+                                                </form>
+                                            </tbody>
+                                        </table>
+
+                                </article> <!-- card.// -->
+                            </div>
+
+
+                            <div class="tab-pane fade show " id="list-edit" role="tabpanel"
+                                aria-labelledby="list-edit-list">
+                                <article class="card mb-3">
+                                    <div class="card-body">
+                                        <strong>แก้ไขข้อมูลส่วนตัว</strong>
+                                        <hr>
+                                        <!-- <div class="icon">
+                                            <img class="rounded-circle img-sm border" src="images/product/noimage.jpg">
+                                        </div> -->
+                                        <div class="text">
+                                            <div class="form-group">
+                                                <label for="fname">ชื่อ :</label>
+                                                <input type="text" class="form-control" id="fname"
+                                                    placeholder="กรอกชื่อจริง" value=" <%= locals.fname %>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="lname">นามสกุล :</label>
+                                                <input type="text" class="form-control" id="lname"
+                                                    placeholder="กรอกนามสกุล" value=" <%= locals.lname %>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">อีเมล :</label>
+                                                <input type="text" class="form-control" id="email"
+                                                    placeholder="example@example.com"
+                                                    value="<%= profiles[0].user_email %>">
+                                            </div>
+                                        </div>
+
+                                        <hr>
+
+                                        <p>
+                                            <% if(address.length>0) { %>
+                                                <i class="fa fa-map-marker text-muted"></i> &nbsp; ที่อยู่ของฉัน <button
+                                                    type="button" class="btn btn-sm btn-warning" style="float:right;"
+                                                    data-toggle="modal" data-target="#editAddress">แก้ไขที่อยู่</button>
+                                                <hr>
+
+                                                <%= address[0].address_detail %>
+                                                    <%= address[0].address_district %>
+                                                        <%= address[0].address_province %>
+                                                            <%= address[0].address_zipcode %>
+                                                                <% }else{ %>
+                                                                    <i class="fa fa-map-marker text-muted"></i> &nbsp;
+                                                                    ที่อยู่ของฉัน <button type="button"
+                                                                        class="btn btn-sm btn-warning"
+                                                                        style="float:right;" data-toggle="modal"
+                                                                        data-target="#addAddress">เพิ่มที่อยู่</button>
+                                                                    <hr>
+                                                                    ไม่มีข้อมูล
+                                                                    <% } %>
+                                        </p>
+                                </article> <!-- card.// -->
+                            </div>
+                        </div>
+                    </main> <!-- col.// -->
+                </div> <!-- card-body .// -->
+            </div> <!-- container .//  -->
+        </section>
+        <!-- ========================= SECTION CONTENT END// ========================= -->
+        <!-- Modal -->
+        <div class="modal fade" id="editAddress" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">แก้ไขที่อยู่</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="" method="post" id="formEditAddress">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" name="province" id="Eprovince"
+                                        placeholder="จังหวัด"
+                                        value="<% if(address.length>0) {%><%=address[0].address_province %><%}else{%><%}%>"
+                                        required>
+                                </div><br>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" name="district" id="Edistrict"
+                                        placeholder="อำเภอ"
+                                        value="<% if(address.length>0) {%><%=address[0].address_district %><%}else{%><%}%>"
+                                        required>
+                                </div>
+                            </div><br>
+                            <input type="number" class="form-control" name="zipcode" id="Ezipcode" maxlength="5"
+                                placeholder="รหัสไปรษณีย์"
+                                value="<% if(address.length>0) {%><%=address[0].address_zipcode %><%}else{%><%}%>"
+                                required><br>
+                            <textarea style="resize: none;" class="form-control" name="detail" id="Edetail" cols="20"
+                                rows="2" maxlength="100"
+                                placeholder="รายละเอียดที่อยู่"><% if(address.length>0) {%><%=address[0].address_detail %><%}else{%><%}%></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="btnEditAddress"
+                                id="btnEditAddress">บันทึกที่อยู่</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addAddress" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">ที่อยู่ใหม่</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="" method="post" id="formAddress">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" name="province" id="province"
+                                        placeholder="จังหวัด" required>
+                                </div><br>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" name="district" id="district"
+                                        placeholder="อำเภอ" required>
+                                </div>
+                            </div><br>
+                            <input type="number" class="form-control" name="zipcode" id="zipcode" maxlength="5"
+                                placeholder="รหัสไปรษณีย์" required><br>
+                            <textarea style="resize: none;" class="form-control" name="detail" id="detail" cols="20"
+                                rows="2" maxlength="100" placeholder="รายละเอียดที่อยู่"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="btnAddress"
+                                id="btnAddress">บันทึกที่อยู่</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= FOOTER ========================= -->
+        <%- include('../include/footer_user') %>
+            <!-- ========================= FOOTER END // ========================= -->
+
+</body>
+
+</html>

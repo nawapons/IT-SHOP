@@ -1,0 +1,404 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="max-age=604800" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Kancomputer</title>
+
+    <!-- <link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"> -->
+
+    <!-- jQuery -->
+    <script src="/js/jquery-2.0.0.min.js" type="text/javascript"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Bootstrap4 files-->
+    <script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <!-- DatePicker -->
+    <link href="/datepicker/css/datepicker.css" rel="stylesheet">
+    <script type="text/javascript" src="/datepicker/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="/datepicker/js/bootstrap-datepicker-thai.js"></script>
+    <script type="text/javascript" src="/datepicker/js/locales/bootstrap-datepicker.th.js"></script>
+    <!-- Font awesome 5 -->
+    <link href="/fonts/fontawesome/css/all.min.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css">
+
+    <!-- custom style -->
+    <link href="/css/ui.css" rel="stylesheet" type="text/css" />
+    <link href="/css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+    <!-- custom javascript -->
+    <script src="/js/script.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        /// some script
+        function previewFile(input) {
+            var file = $(".pictureedit").get(0).files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function () {
+                    $(".showpictureedit").attr("src", reader.result);
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+        // jquery ready start
+        $(document).ready(function () {
+
+            picture.onchange = evt => { //function show picture
+                const [file] = picture.files
+                if (file) {
+                    showpicture.src = URL.createObjectURL(file)
+                }
+            }
+
+
+            // jQuery code
+            $('.showBanner').DataTable();
+            $('.datepicker').datepicker({
+                format: 'dd-mm-yyyy',
+                autoclose: true,
+                language: 'th-th',
+            });
+
+            const Toast = Swal.mixin({ //swal Sweelalert
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1300,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            $("#FormAddBanner").on("submit", function (e) {
+                e.preventDefault();
+                let formData = new FormData($(this)[0]);
+                formData.append('proimg', $('#picture')[0].files[0]);
+                $.ajax({
+                    type: "POST",
+                    url: "/auth/addBanner",
+                    data: formData,
+                    cache: false,
+                    contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                    processData: false,
+                    success: function (response) {
+                        if (response == "success") {
+                            Toast.fire({                //sweetalert success
+                                icon: 'success',
+                                title: 'เพิ่มแบนเนอร์สำเร็จ'
+                            }).then(function () {
+                                location.reload();
+                            })
+                        } else {
+                            Toast.fire({                //sweetalert error
+                                icon: 'error',
+                                title: response
+                            })
+                        }
+                    }
+                });
+            });
+
+            $(".FormEditBanner").on("submit", function (e) {
+                e.preventDefault();
+                let formData = new FormData($(this)[0]);
+                formData.append('id', $('.linkedit').attr("rowid"));
+                formData.append('editimg', $('.pictureedit')[0].files[0]);
+                $.ajax({
+                    type: "POST",
+                    url: "/auth/editBanner",
+                    data: formData,
+                    cache: false,
+                    contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                    processData: false,
+                    success: function (response) {
+                        if (response == "success") {
+                            Toast.fire({                //sweetalert success
+                                icon: 'success',
+                                title: 'แก้ไขแบนเนอร์สำเร็จ'
+                            }).then(function () {
+                                location.reload();
+                            })
+                        } else {
+                            Toast.fire({                //sweetalert error
+                                icon: 'error',
+                                title: response
+                            })
+                        }
+                    }
+                });
+            });
+
+            $('.showBanner tbody').on('click', '.deletebtn', function (e) {
+                e.preventDefault();
+                let id = $(this).attr("rowid");
+                Swal.fire({
+                    title: 'ต้องการลบแบนเนอร์หรือไม่?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'ลบสินค้า!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/auth/delBanner",
+                            data: { id: id },
+                            success: function (response) {
+                                if (response == "success") {
+                                    Toast.fire({                //sweetalert success
+                                        icon: 'success',
+                                        title: 'ลบสินค้าสำเร็จ'
+                                    }).then(function () {
+                                        location.reload();
+                                    })
+                                } else {
+                                    Toast.fire({                //sweetalert error
+                                        icon: 'error',
+                                        title: response
+                                    })
+                                }
+                            }
+                        });
+                    }
+                })
+            })
+        });
+// jquery end
+    </script>
+
+</head>
+
+<body>
+
+
+    <%- include('../include/header_admin') %>
+
+        <!-- ========================= SECTION INTRO END// ========================= -->
+        <nav class="navbar navbar-main navbar-expand-lg navbar-light border-bottom">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav"
+                    aria-controls="main_nav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="main_nav">
+                    <ul class="navbar-nav">
+                        <a class="nav-link pl-0" href="home"><strong>&nbsp ADMIN PAGE |</strong></a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="product">จัดการสินค้า</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">รายการสั่งซื้อ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="banner">ประชาสัมพันธ์</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/setUser">จัดการสมาชิก</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">จัดการระบบ</a>
+                        </li>
+
+
+                    </ul>
+                </div> <!-- collapse .// -->
+            </div> <!-- container .// -->
+        </nav>
+
+
+        <!-- ========================= SECTION FEATURE ========================= -->
+        <div class="container">
+            <button class="btn btn-info btn-sm mt-2" data-toggle="modal" data-target="#addUser"><i
+                    class="fas fa-plus"></i> เพิ่มแบนเนอร์</button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle"><i class="fas fa-plus"></i>
+                                เพิ่มแบนเนอร์
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="" id="FormAddBanner" method="POST" enctype="multipart/form-data">
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label>ลิ้งค์เชื่อมโยง</label>
+                                    <input type="text" class="form-control" placeholder="www.example.com" name="link"
+                                        id="link">
+                                </div> <!-- form-group end.// -->
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label for="picture" class="form-label">รูปแบนเนอร์</label>
+                                            <input class="form-control-sm" id="picture" name="picture" type="file"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <img id="showpicture" src="/images/product/noimage.jpg" alt="your image"
+                                            width="450" height="250" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!---modal body end-->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                                <button type="submit" class="btn btn-primary">เพิ่มแบนเนอร์</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!---modal end-->
+            <hr>
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="list-admin" role="tabpanel"
+                            aria-labelledby="list-admin-list">
+                            <% if(banners.length> 0){ %>
+                                <table class="table table-hover mt-3 showBanner">
+                                    <thead style="background-color: #219ebc;color: #f1faee;">
+                                        <tr>
+                                            <th scope="col">ลำดับ</th>
+                                            <th scope="col">รูปภาพ</th>
+                                            <th scope="col">ลิ้งค์เชื่อมโยง</th>
+                                            <th scope="col">แก้ไข</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <% var i=1; banners.forEach((banner,index)=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= i %>
+                                                </td>
+                                                <td><img id="showbanner"
+                                                        src="/images/banners/<%= banner.banner_picture  %>"
+                                                        alt="your image" width="200" height="80" /> </td>
+                                                <td>
+                                                    <%= banner.banner_link %>
+                                                </td>
+                                                <td><button class="btn btn-sm btn-warning" data-toggle="modal"
+                                                        data-target="#editID<%= banner.banner_id  %>"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <!-- Modal -->
+                                                    <div class="modal fade" id="editID<%= banner.banner_id %>"
+                                                        tabindex="-1" role="dialog"
+                                                        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered modal-lg"
+                                                            role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLongTitle">
+                                                                        <i class="fas fa-plus"></i>
+                                                                        แก้ไขแบนเนอร์
+                                                                    </h5>
+                                                                    <button type="button" class="close"
+                                                                        data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <form action="" class="FormEditBanner" method="POST"
+                                                                    enctype="multipart/form-data">
+                                                                    <div class="modal-body">
+
+                                                                        <div class="form-group">
+                                                                            <label>ลิ้งค์เชื่อมโยง</label>
+                                                                            <input type="text"
+                                                                                class="form-control linkedit"
+                                                                                placeholder="www.example.com"
+                                                                                name="linkedit"
+                                                                                value="<%= banner.banner_link %>"
+                                                                                rowid="<%= banner.banner_id %>">
+                                                                        </div> <!-- form-group end.// -->
+                                                                        <div class="row">
+                                                                            <div class="col-4">
+                                                                                <div class="form-group">
+                                                                                    <label for="picture"
+                                                                                        class="form-label">รูปแบนเนอร์</label>
+                                                                                    <input
+                                                                                        class="form-control-sm pictureedit"
+                                                                                        name="pictureedit" type="file"
+                                                                                        onchange="previewFile(this);">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-8">
+                                                                                <img class="showpictureedit"
+                                                                                    src="/images/banners/<%=banner.banner_picture %>"
+                                                                                    alt="your image" width="450"
+                                                                                    height="250" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!---modal body end-->
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary"
+                                                                            data-dismiss="modal">ยกเลิก</button>
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">เพิ่มแบนเนอร์</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!---modal end-->
+
+                                                    <button class="btn btn-sm btn-danger deletebtn" rowid="<%= banner.banner_id %>"><i
+                                                            class="fas fa-trash" ></i></button>
+                                                </td>
+                                            </tr>
+                                            <% i++ }) %>
+
+                                    </tbody>
+                                </table>
+
+
+                                <% }else{ %>
+                                    <p class="text-center">No banner.</p>
+                                    <% } %>
+
+                        </div>
+                        <!----------Emp Role----->
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+
+</body>
+
+</html>

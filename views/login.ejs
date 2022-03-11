@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="cache-control" content="max-age=604800" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>Itshop</title>
+
+	<!-- <link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"> -->
+
+	<!-- jQuery -->
+	<script src="/js/jquery-2.0.0.min.js" type="text/javascript"></script>
+	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- Bootstrap4 files-->
+	<script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+	<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+
+	<!-- Font awesome 5 -->
+	<link href="/fonts/fontawesome/css/all.min.css" type="text/css" rel="stylesheet">
+
+	<!-- custom style -->
+	<link href="/css/ui.css" rel="stylesheet" type="text/css" />
+	<link href="/css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+	<!-- custom javascript -->
+	<script src="/js/script.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		/// some script
+
+		// jquery ready start
+		$(document).ready(function () {
+			const Toast = Swal.mixin({
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				timer: 1300,
+				timerProgressBar: true,
+				didOpen: (toast) => {
+					toast.addEventListener('mouseenter', Swal.stopTimer)
+					toast.addEventListener('mouseleave', Swal.resumeTimer)
+				}
+			})
+			$("#form").on("submit", function (e) {
+				e.preventDefault();
+				let email = $('#email').val();
+				let password = $('#password').val();
+				$.ajax({
+					url: "/auth/login",
+					method: "POST",
+					data: {
+						email: email,
+						password: password,
+					},
+					success: function (data) {
+						if (data== "User") {
+							Toast.fire({                //sweetalert success
+								icon: 'success',
+								title: 'เข้าสู่ระบบสำเร็จ'
+							}).then(function () {
+								location.href='home'
+							})
+						} else if (data == "Emp") {
+							Toast.fire({                //sweetalert success
+								icon: 'success',
+								title: 'เข้าสู่ระบบสำเร็จ'
+							}).then(function () {
+								location.href='home'
+							})
+						} else if (data== "Admin") {
+							Toast.fire({                //sweetalert success
+								icon: 'success',
+								title: 'เข้าสู่ระบบสำเร็จ'
+							}).then(function () {
+								location.href='home'
+							})
+						} else {
+							Toast.fire({                //sweetalert success
+								icon: 'error',
+								title: data
+							})
+						}
+					}
+				})
+			});
+		});
+// jquery end
+	</script>
+</head>
+
+<body>
+
+
+	<%- include('include/header') %>
+
+
+
+		<!-- ========================= SECTION CONTENT ========================= -->
+		<section class="section-conten padding-y" style="min-height:84vh">
+
+			<!-- ============================ COMPONENT LOGIN   ================================= -->
+			<div class="card mx-auto" style="max-width: 380px; margin-top:100px;">
+				<div class="card-body">
+					<h4 class="card-title mb-4">เข้าสู่ระบบ</h4>
+					<form action="" method="POST" id="form">
+						<!-- <a href="#" class="btn btn-facebook btn-block mb-2"> <i class="fab fa-facebook-f"></i> &nbsp
+							Sign in with Facebook</a>
+						<a href="#" class="btn btn-google btn-block mb-4"> <i class="fab fa-google"></i> &nbsp Sign in
+							with Google</a> -->
+						<div class="form-group">
+							<input name="email" class="form-control" placeholder="อีเมล" type="email" id="email">
+						</div> <!-- form-group// -->
+						<div class="form-group">
+							<input name="password" class="form-control" placeholder="รหัสผ่าน" type="password"
+								id="password">
+						</div> <!-- form-group// -->
+
+						<div class="form-group">
+							<a href="#" class="float-right">ลืมรหัสผ่าน?</a>
+							<label class="float-left custom-control custom-checkbox"> <input type="checkbox"
+									class="custom-control-input" checked="">
+								<div class="custom-control-label"> Remember </div>
+							</label>
+						</div> <!-- form-group form-check .// -->
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary btn-block"> เข้าสู่ระบบ </button>
+						</div> <!-- form-group// -->
+					</form>
+				</div> <!-- card-body.// -->
+			</div> <!-- card .// -->
+
+			<p class="text-center mt-4">ยังไม่มีบัญชี? <a href="/register">สมัครสมาชิก</a></p>
+			<br><br>
+			<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+
+
+		</section>
+		<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+		<!-- ========================= FOOTER ========================= -->
+		<%- include('include/footer') %>
+			<!-- ========================= FOOTER END // ========================= -->
+
+
+
+</body>
+
+</html>

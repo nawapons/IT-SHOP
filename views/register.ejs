@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="cache-control" content="max-age=604800" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>ITSHOP</title>
+
+	<link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+	<!-- jQuery -->
+	<script src="/js/jquery-2.0.0.min.js" type="text/javascript"></script>
+
+	<!-- DatePicker -->
+	<link href="/datepicker/css/datepicker.css" rel="stylesheet">
+	<script type="text/javascript" src="/datepicker/js/bootstrap-datepicker.js"></script>
+	<script type="text/javascript" src="/datepicker/js/bootstrap-datepicker-thai.js"></script>
+	<script type="text/javascript" src="/datepicker/js/locales/bootstrap-datepicker.th.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- Bootstrap4 files-->
+	<script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+	<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+
+	<!-- Font awesome 5 -->
+	<link href="/fonts/fontawesome/css/all.min.css" type="text/css" rel="stylesheet">
+
+	<!-- custom style -->
+	<link href="/css/ui.css" rel="stylesheet" type="text/css" />
+	<link href="/css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+	<!-- custom javascript -->
+	<script src="/js/script.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		/// some script
+
+		// jquery ready start
+		$(document).ready(function () {
+			const Toast = Swal.mixin({
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				timer: 1300,
+				timerProgressBar: true,
+				didOpen: (toast) => {
+					toast.addEventListener('mouseenter', Swal.stopTimer)
+					toast.addEventListener('mouseleave', Swal.resumeTimer)
+				}
+			})
+			$("#form").on("submit", function (e) {
+			e.preventDefault();
+            let fname = $('#fname').val();
+            let lname = $('#lname').val();
+            let email = $('#email').val();
+			let gender = $('.gender').val();
+			let date = $('#date').val();
+            let password = $('#password').val();
+			let confpassword = $('#confpassword').val();
+			$.ajax({
+				url: "/auth/register",
+				method: "POST",
+				data: {
+					fname: fname,
+					lname: lname,
+					gender: gender,
+					date: date,
+					email: email,
+					password: password,
+					confpassword: confpassword
+				},
+				success: function(data) {
+                    if (data == "success") {
+                        Toast.fire({                //sweetalert success
+                            icon: 'success',
+                            title: 'สมัครสมาชิกสำเร็จ'
+                        }).then(function(){
+                            location.href='login';
+                        })
+                    } else {
+                        Toast.fire({                //sweetalert success
+                            icon: 'error',
+                            title: data
+                        })
+                    }
+                }
+				})
+			});
+		});
+		$('.datepicker').datepicker({
+			format: 'dd-mm-yyyy',
+			autoclose: true,
+			language: 'th-th',
+		});
+
+		
+			
+		// jquery end
+
+
+	</script>
+
+</head>
+
+<body>
+
+
+	<%-include('include/header')%>
+
+
+
+		<!-- ========================= SECTION CONTENT ========================= -->
+		<section class="section-content padding-y">
+
+			<!-- ============================ COMPONENT REGISTER   ================================= -->
+			<div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+				<article class="card-body">
+					<header class="mb-4">
+						<h4 class="card-title">สมัครสมาชิก</h4>
+					</header>
+					<form action="" method="POST" id="form">
+						<div class="form-row">
+							<div class="col form-group">
+								<label>ชื่อ</label>
+								<input type="text" class="form-control" placeholder"" name="fname" id="fname" required>
+							</div> <!-- form-group end.// -->
+							<div class="col form-group">
+								<label>นามสกุล</label>
+								<input type="text" class="form-control" placeholder="" name="lname" id="lname" required>
+							</div> <!-- form-group end.// -->
+						</div> <!-- form-row end.// -->
+						<div class="form-group">
+							<label>อีเมล</label>
+							<input type="email" class="form-control" placeholder="" name="email" id="email" required>
+						</div> <!-- form-group end.// -->
+						<div class="form-group">
+							<label>เพศ</label>&nbsp;&nbsp;&nbsp;
+							<label class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input gender" checked="" type="radio" name="gender" value="M" required>
+								<span class="custom-control-label"> ชาย </span>
+							</label>
+							<label class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input gender" type="radio" name="gender" value="W" required>
+								<span class="custom-control-label"> หญิง </span>
+							</label>
+						</div> <!-- form-group end.// -->
+						<div class="form-row">
+							<div class="form-group col-md-12">
+								<label>วัน/เดือน/ปีเกิด</label>
+								<input type="text" class="form-control datepicker" data-provide="datepicker"
+									data-date-language="th-th" autocomplete="off" name="date" id="date" required>
+							</div> <!-- form-group end.// -->
+						</div> <!-- form-row.// -->
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label>รหัสผ่าน</label>
+								<input class="form-control" type="password" name="password" id="password" required>
+							</div> <!-- form-group end.// -->
+							<div class="form-group col-md-6">
+								<label>ยืนยันรหัสผ่าน</label>
+								<input class="form-control" type="password" name="confpassword" id="confpassword" required>
+							</div> <!-- form-group end.// -->
+						</div>
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary btn-block"> สมัครสมาชิก </button>
+						</div> <!-- form-group// -->
+						<!-- <% if (locals.message) { %>
+							<div class="alert alert-danger" role="alert">
+								<%=message%>
+							</div>
+							<% } %> -->
+					</form>
+				</article><!-- card-body.// -->
+			</div> <!-- card .// -->
+			<p class="text-center mt-4">มีบัญชีแล้วใช่ไหม? <a href="/login">เข้าสู่ระบบ</a></p>
+			<br><br>
+			<!-- ============================ COMPONENT REGISTER  END.// ================================= -->
+
+
+		</section>
+		<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+		<!-- ========================= FOOTER ========================= -->
+		<%- include('include/footer') %>
+			<!-- ========================= FOOTER END // ========================= -->
+
+
+
+</body>
+
+</html>

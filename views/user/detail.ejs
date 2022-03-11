@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="max-age=604800" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Kancomputer</title>
+
+    <!-- <link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"> -->
+
+    <!-- jQuery -->
+    <script src="/js/jquery-2.0.0.min.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/js-image-zoom@0.7.0/js-image-zoom.js" type="application/javascript"></script>
+    <!-- Bootstrap4 files-->
+    <script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+
+    <!-- Font awesome 5 -->
+    <link href="/fonts/fontawesome/css/all.min.css" type="text/css" rel="stylesheet">
+
+    <!-- custom style -->
+    <link href="/css/ui.css" rel="stylesheet" type="text/css" />
+    <link href="/css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+    <link rel="stylesheet" type="text/css" href="/css/magnifier.css">
+    <!-- custom javascript -->
+    <script src="/js/script.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/js/Event.js"></script>
+    <script type="text/javascript" src="/js/Magnifier.js"></script>
+    <script type="text/javascript">
+        /// some script
+
+        // jquery ready start
+        $(document).ready(function () {
+            $('.addCart').click(function (e) {
+                e.preventDefault();
+                let id = $(this).attr("rowid");
+                $.ajax({
+                    type: "POST",
+                    url: "/auth/addCart",
+                    data: { id: id },
+                    success: function (response) {
+                        if (response == "success") {
+                            location.reload();
+                        } else {
+                            Toast.fire({                //sweetalert error
+                                icon: 'error',
+                                title: response
+                            }).then(function () {
+                                location.reload();
+                            })
+                        }
+                    }
+                });
+            })
+        });
+// jquery end
+    </script>
+
+</head>
+<style>
+    #NameProduct {
+        color: black;
+    }
+
+    #NameProduct:hover {
+        text-decoration: underline;
+    }
+
+    .boxShadow {
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    #pictureP-lens {
+        background-color: rgba(255, 255, 255, .5);
+    }
+</style>
+
+<body>
+
+
+    <%- include('../include/header') %>
+
+        <% if (products.length> 0){ %>
+            <% products.forEach((product,index)=> { %>
+
+
+                <section class="section-pagetop bg">
+                    <div class="container">
+                        <h2 class="title-page">รายละเอียดสินค้า</h2>
+                        <nav>
+                            <ol class="breadcrumb text-white">
+                                <li class="breadcrumb-item"><a href="/home">หน้าหลัก</a></li>
+                                <li class="breadcrumb-item"><a href="/product">สินค้าทั้งหมด</a></li>
+                                <!-- <li class="breadcrumb-item"><a href="#">Best category</a></li> -->
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    <%= product.product_name %>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div> <!-- container //  -->
+                </section>
+
+
+                <section class="section-content padding-y">
+                    <div class="container">
+                        <h1 style="word-break: break-all; margin-bottom: 15px;font-size: 26px;">
+                            <a id="NameProduct" href="/auth/detail/<%= product.product_id %>">
+                                <%= product.product_name %>
+                            </a>
+                        </h1>
+                        <hr>
+                        <div class="row">
+
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <img class="opaque" id="pictureP"
+                                            src="/images/product/<%= product.product_picture %>" width="700px">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="magnifier-preview" id="preview" style="width: 250px; height: 250px">
+                                        </div>
+                                        <script>
+                                            var evt = new Event();
+                                            var m = new Magnifier(evt);
+                                            m.attach({
+                                                thumb: '#pictureP',
+                                                large: '/images/product/<%= product.product_picture %>',
+                                                largeWrapper: 'preview',
+                                                zoom: 3,
+                                                onthumbmove: function () {
+                                                    $('#preview').addClass('boxShadow');
+                                                },
+                                                onthumbleave: function () {
+                                                    $('#preview').removeClass('boxShadow');
+                                                },
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+
+                                <div class="card shadow-sm" id="cardDetail">
+                                    <div class="card-body">
+                                        <b>
+                                            <%= product.product_name %>
+                                        </b>
+                                        <p style="font-size: 12px;">(<%= product.product_id %>)</p>
+                                        <hr>
+                                        <p><b>รายละเอียดสินค้า : </b>
+                                            <%= product.product_detail %>
+                                        </p>
+                                        <div id="quantity"
+                                            style=" display: table; position: relative; width: 100%;background-color: #efefef;">
+                                            <center>จำนวนคงเหลือ <strong>
+                                                    <%= product.product_quantity %>
+                                                </strong> ชิ้น</center>
+
+                                        </div><br>
+                                        <center>
+                                            <p style="font-size: 22px;">ราคา <strong style="font-size: 30px;color:red;">
+                                                    <%= product.product_price %>
+                                                </strong> บาท</p>
+                                        </center>
+                                        <p></p>
+                                        <button type="submit" class="btn btn-primary btn-block addCart"
+                                            rowid="<%= product.product_id %>"><i class="fa fa-shopping-cart"></i>
+                                            <span class="text">เพิ่มสินค้าในตะกร้า</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% }) %>
+                            <% }else{ %>
+
+                                <% } %>
+
+
+
+
+
+
+                                    <br><br><br><br><br><br><br><br><br>
+
+                                    </article>
+
+                    </div> <!-- container .//  -->
+                </section>
+                <!-- ========================= SECTION CONTENT END// ========================= -->
+
+                <!-- ========================= FOOTER ========================= -->
+                <footer class="section-footer border-top padding-y">
+                    <div class="container">
+                        <p class="float-md-right">
+                            &copy Copyright 2019 All rights reserved
+                        </p>
+                        <p>
+                            <a href="#">Terms and conditions</a>
+                        </p>
+                    </div><!-- //container -->
+                </footer>
+                <!-- ========================= FOOTER END // ========================= -->
+
+
+</body>
+
+</html>
